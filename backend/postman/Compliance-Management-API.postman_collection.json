@@ -1,0 +1,903 @@
+{
+	"info": {
+		"_postman_id": "compliance-management-api",
+		"name": "Compliance Management System API",
+		"description": "Complete API collection for the Compliance and Document Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "compliance-api"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@company.com\",\n  \"password\": \"password123\",\n  \"department\": \"IT\",\n  \"role\": \"department_user\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@company.com\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "profile"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Updated\",\n  \"department\": \"Finance\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "profile"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"admin123\",\n  \"newPassword\": \"newpassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/change-password",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "change-password"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "logout"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard?department=IT",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard"],
+							"query": [
+								{
+									"key": "department",
+									"value": "IT"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Department Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/department/IT",
+							"host": ["{{base_url}}"],
+							"path": ["api", "dashboard", "department", "IT"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Documents",
+			"item": [
+				{
+					"name": "Upload Document",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "form-data",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/document.pdf"
+								},
+								{
+									"key": "title",
+									"value": "Sample Document",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "This is a sample document for testing",
+									"type": "text"
+								},
+								{
+									"key": "department",
+									"value": "IT",
+									"type": "text"
+								},
+								{
+									"key": "tags",
+									"value": "[\"policy\", \"compliance\"]",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/documents",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Documents",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents?page=1&limit=20&status=Approved&department=IT&search=policy",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "Approved"
+								},
+								{
+									"key": "department",
+									"value": "IT"
+								},
+								{
+									"key": "search",
+									"value": "policy"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Document by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents/{{document_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "{{document_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Document Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Approved\",\n  \"reviewComments\": \"Document meets all requirements and is approved for use.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/documents/{{document_id}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "{{document_id}}", "status"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Document Versions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents/{{document_id}}/versions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "{{document_id}}", "versions"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Document Version",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "form-data",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/path/to/updated-document.pdf"
+								},
+								{
+									"key": "changeDescription",
+									"value": "Updated content and formatting",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/documents/{{document_id}}/versions",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "{{document_id}}", "versions"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Document",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/documents/{{document_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "documents", "{{document_id}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Compliance",
+			"item": [
+				{
+					"name": "Get Compliance Tasks",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/compliance?page=1&limit=20&status=Pending&priority=High&dueSoon=true",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "status",
+									"value": "Pending"
+								},
+								{
+									"key": "priority",
+									"value": "High"
+								},
+								{
+									"key": "dueSoon",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Compliance Task by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/compliance/{{compliance_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance", "{{compliance_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Compliance Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"documentId\": \"{{document_id}}\",\n  \"dueDate\": \"2024-02-15T00:00:00.000Z\",\n  \"priority\": \"High\",\n  \"complianceType\": \"Document Review\",\n  \"description\": \"Review and approve the uploaded document\",\n  \"assignedTo\": \"{{user_id}}\",\n  \"reminders\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/compliance",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Compliance Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"Resolved\",\n  \"resolutionNotes\": \"Compliance task completed successfully. All requirements have been met.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/compliance/{{compliance_id}}/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance", "{{compliance_id}}", "status"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Compliance Task",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"priority\": \"Critical\",\n  \"dueDate\": \"2024-02-20T00:00:00.000Z\",\n  \"description\": \"Updated compliance task description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/compliance/{{compliance_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance", "{{compliance_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Overdue Compliance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/compliance/overdue/list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance", "overdue", "list"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Due Soon Compliance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/compliance/due-soon/list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance", "due-soon", "list"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Compliance Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/compliance/stats/overview",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance", "stats", "overview"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Compliance Task",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/compliance/{{compliance_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "compliance", "{{compliance_id}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Knowledge Base",
+			"item": [
+				{
+					"name": "Index Document",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"documentId\": \"{{document_id}}\",\n  \"title\": \"Sample Knowledge Base Entry\",\n  \"content\": \"This is the full content of the document that will be indexed for semantic search.\",\n  \"summary\": \"Brief summary of the document content\",\n  \"category\": \"Policy\",\n  \"department\": \"IT\",\n  \"tags\": [\"policy\", \"compliance\", \"guidelines\"],\n  \"keywords\": [\"security\", \"procedures\", \"standards\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base/index",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base", "index"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Semantic Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base/search/semantic?q=security policies&department=IT&category=Policy&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base", "search", "semantic"],
+							"query": [
+								{
+									"key": "q",
+									"value": "security policies"
+								},
+								{
+									"key": "department",
+									"value": "IT"
+								},
+								{
+									"key": "category",
+									"value": "Policy"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Text Search",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base/search/text?q=compliance procedures&department=IT&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base", "search", "text"],
+							"query": [
+								{
+									"key": "q",
+									"value": "compliance procedures"
+								},
+								{
+									"key": "department",
+									"value": "IT"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Knowledge Base Entries",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base?page=1&limit=20&category=Policy&department=IT&search=security",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "category",
+									"value": "Policy"
+								},
+								{
+									"key": "department",
+									"value": "IT"
+								},
+								{
+									"key": "search",
+									"value": "security"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Knowledge Base Entry by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base/{{knowledge_base_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base", "{{knowledge_base_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Knowledge Base Entry",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Knowledge Base Entry\",\n  \"content\": \"Updated content with new information\",\n  \"summary\": \"Updated summary\",\n  \"category\": \"Procedure\",\n  \"tags\": [\"updated\", \"procedure\", \"guidelines\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base/{{knowledge_base_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base", "{{knowledge_base_id}}"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Knowledge Base Stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base/stats/overview",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base", "stats", "overview"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Knowledge Base Entry",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/knowledge-base/{{knowledge_base_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "knowledge-base", "{{knowledge_base_id}}"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Ping",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ping",
+							"host": ["{{base_url}}"],
+							"path": ["ping"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "document_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "compliance_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "knowledge_base_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
