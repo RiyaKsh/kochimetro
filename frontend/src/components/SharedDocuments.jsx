@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const departments = ['Engineering', 'HR', 'Finance', 'Safety', 'Legal'];
-
-const sampleDocuments = [
-  { title: 'Safety Protocol Update Q4 2025', date: '2025-09-13', status: 'Pending Review' },
-  { title: 'Budget Allocation Report', date: '2025-09-13', status: 'Approved' },
-  { title: 'Engineering Standards Manual', date: '2025-09-13', status: 'Under Review' },
-  { title: 'Manual Update', date: '2025-09-13', status: 'Draft' },
-];
 
 const statusColors = {
   'Pending Review': 'bg-yellow-300 text-yellow-800',
@@ -18,10 +12,38 @@ const statusColors = {
 
 export default function SharedDocuments() {
   const [activeDept, setActiveDept] = useState('Engineering');
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem('token'); // your auth token
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get('http://localhost:8080/api/documents/shared', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Filter documents by active department
+        const filteredDocs = res.data.data.filter(
+          (doc) => doc.department === activeDept
+        );
+
+        setDocuments(filteredDocs);
+      } catch (err) {
+        console.error('Error fetching shared documents:', err);
+        setDocuments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, [activeDept]); // refetch whenever the department changes
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
-      
       <h2 className="text-xl font-semibold mb-4">Department Documents</h2>
 
       {/* Department Tabs */}
@@ -39,26 +61,39 @@ export default function SharedDocuments() {
         ))}
       </div>
 
-      {/* Documents List */}
-      <div className="space-y-4">
-        {sampleDocuments.map((doc, index) => (
-          <div key={index} className="flex items-center justify-between bg-gray-100 p-4 rounded shadow-sm">
-            <div>
-              <h3 className="font-semibold">{doc.title}</h3>
-              <p className="text-sm text-gray-600">{doc.date}</p>
-            </div>
+      {loading ? (
+        <p>Loading documents...</p>
+      ) : !documents.length ? (
+        <p>No documents available for this department</p>
+      ) : (
+        <div className="space-y-4">
+          {documents.map((doc) => (
+            <div
+              key={doc._id}
+              className="flex items-center justify-between bg-gray-100 p-4 rounded shadow-sm"
+            >
+              <div>
+                <h3 className="font-semibold">{doc.title}</h3>
+                <p className="text-sm text-gray-600">
+                  {new Date(doc.createdAt).toLocaleDateString()}
+                </p>
+              </div>
 
-            <div className="flex items-center space-x-4">
-              <span className={`px-2 py-1 rounded text-sm ${statusColors[doc.status]}`}>
-                {doc.status}
-              </span>
+              <div className="flex items-center space-x-4">
+                <span
+                  className={`px-2 py-1 rounded text-sm ${statusColors[doc.status] || 'bg-gray-300 text-gray-800'}`}
+                >
+                  {doc.status}
+                </span>
 
-              <button className="text-green-600 hover:underline">Approve</button>
-              <button className="text-red-600 hover:underline">Reject</button>
+                {/* Optional action buttons */}
+                <button className="text-green-600 hover:underline">Approve</button>
+                <button className="text-red-600 hover:underline">Reject</button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
