@@ -524,34 +524,28 @@ const generateComplianceTask = async (documentId, department, assignedTo) => {
 };
 const getSharedDocuments = async (req, res) => {
   try {
-    const user = req.user;
-
-    if (!user || user.role !== "admin") {
-      return res.status(403).json({
-        success: false,
-        message: "Only admins can view shared documents",
-      });
+    const admin = req.user; // make sure middleware sets this
+    console.log('Admin:', admin);
+    if (!admin) {
+      return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const sharedDocs = await Document.find({
-      allowedDepts: user.department,         // their dept is in allowedDepts
-      department: { $ne: user.department },  // exclude their own dept docs
-    })
-      .populate("createdBy", "name email department") // optional, shows who uploaded
-      .select("title status createdAt department");
+    if (admin.role !== 'admin') {
+      return res.status(403).json({ message: 'Admins only' });
+    }
+
+    // Fetch documents where admin's department is in allowedDepartments
+    const docs = await Document.find({
+      allowedDepartments: { $in: [admin.department] }
+    }).lean(); // lean() makes it a plain JS object
 
     res.status(200).json({
-      message: "Shared documents fetched successfully",
       success: true,
-      data: sharedDocs,
+      data: docs
     });
   } catch (error) {
-    console.error("Error fetching shared docs:", error);
-    res.status(500).json({
-      message: "Internal server error",
-      success: false,
-      error: error.message,
-    });
+    console.error('Error fetching shared documents:', error);
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 };
 

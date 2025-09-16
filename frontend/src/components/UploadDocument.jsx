@@ -33,26 +33,63 @@ export default function UploadDocument() {
     });
   };
 
-  const handleUpload = () => {
-    if (!file) return alert("Please select a file");
+  const handleUpload = async () => {
+  if (!file) return alert("Please select a file");
 
-    const data = new FormData();
-    data.append("file", file);
+  const data = new FormData();
+  data.append("file", file);
 
-    Object.keys(formData).forEach((key) => {
-      data.append(
-        key,
-        Array.isArray(formData[key])
-          ? JSON.stringify(formData[key])
-          : formData[key]
-      );
-    });
+  // Determine access
+  let access = "self";
+  if (formData.accessControl.includes("department")) access = "department";
+  if (formData.accessControl.includes("shared")) access = "cross-department";
+  data.append("access", access);
 
-    console.log("Uploading with data:", Object.fromEntries(data));
+  // Append allowedDepartments if cross-department
+  if (access === "cross-department" && formData.allowedDepartments) {
+    data.append("allowedDepartments", formData.allowedDepartments.join(","));
+  }
 
-    // Replace with API call
-    // fetch("/api/documents/upload", { method: "POST", body: data });
-  };
+  // Append other fields
+  data.append("title", formData.title);
+  data.append("description", formData.description);
+  data.append("category", formData.category);
+  data.append("language", formData.language);
+  data.append("priority", formData.priority);
+const token = localStorage.getItem("token");
+  try {
+    const res = await fetch("http://localhost:8080/api/documents", {
+  method: "POST",
+  body: data,
+   headers: {
+    Authorization: `Bearer ${token}` // send token in Authorization header
+  },
+  credentials: "include", // if you use cookies for auth
+});
+
+    const result = await res.json();
+    if (res.ok) {
+      alert("Document uploaded successfully");
+      setFile(null);
+      setFormData({
+        title: "",
+        category: "",
+        description: "",
+        department: "",
+        language: "",
+        priority: "",
+        accessControl: [],
+        allowedDepartments: [],
+      });
+    } else {
+      alert(result.message || "Upload failed");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error uploading document");
+  }
+};
+
 
   return (
     <div className="p-6 bg-white rounded-lg shadow">
@@ -156,9 +193,9 @@ export default function UploadDocument() {
               className="w-full border p-2 rounded"
             >
               <option value="">Select Priority</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
             </select>
           </div>
 
@@ -167,8 +204,8 @@ export default function UploadDocument() {
             <label className="block">
               <input
                 type="checkbox"
-                onChange={() => handleAccessChange("private")}
-                checked={formData.accessControl.includes("private")}
+                onChange={() => handleAccessChange("self")}
+                checked={formData.accessControl.includes("self")}
               />
               Private (only me)
             </label>
@@ -183,8 +220,8 @@ export default function UploadDocument() {
             <label className="block">
               <input
                 type="checkbox"
-                onChange={() => handleAccessChange("shared")}
-                checked={formData.accessControl.includes("shared")}
+                onChange={() => handleAccessChange("cross-department")}
+                checked={formData.accessControl.includes("cross-department")}
               />
               Shared across departments
             </label>
