@@ -2,21 +2,15 @@
 
 import React, { useState } from "react";
 import {
-  Bell,
-  LogOut,
-  Search,
   Eye,
-  FileText,
-  Share2,
-  Users,
-  Upload,
-  LayoutDashboard,
 } from "lucide-react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import { NavLink, useNavigate } from "react-router-dom";
 
 export default function Documents() {
   const [activeTab, setActiveTab] = useState("current");
+  const navigate = useNavigate()
 
   const documents = [
     {
@@ -76,27 +70,28 @@ export default function Documents() {
 
               <div className="bg-white shadow-xl rounded-xl p-10 m-10">
                 {/* Tabs */}
-                <div className="flex mb-4">
-                  <button
-                    className={`px-4 py-2 font-medium ${
-                      activeTab === "current"
-                        ? "text-white rounded-xl border-b-2 bg-[#003366]"
-                        : "text-gray-500"
-                    }`}
-                    onClick={() => setActiveTab("current")}
+                <div className="flex mb-4 space-x-2">
+                  <NavLink
+                    to="/documents"
+                    className={({ isActive }) =>
+                      `px-4 py-2 font-medium rounded-xl border-b-2 ${
+                        isActive ? "text-white bg-[#003366] " : "text-gray-500"
+                      }`
+                    }
                   >
                     Current Documents
-                  </button>
-                  <button
-                    className={`px-4 py-2 font-medium ${
-                      activeTab === "previous"
-                        ? "text-white rounded-xl border-b-2 bg-[#003366]"
-                        : "text-gray-500"
-                    }`}
-                    onClick={() => setActiveTab("previous")}
+                  </NavLink>
+
+                  <NavLink
+                    to="/previous"
+                    className={({ isActive }) =>
+                      `px-4 py-2 font-medium rounded-xl border-b-2 ${
+                        isActive ? "text-white bg-[#003366]" : "text-gray-500"
+                      }`
+                    }
                   >
                     Previous Documents
-                  </button>
+                  </NavLink>
                 </div>
 
                 {/* Document list */}
@@ -104,8 +99,10 @@ export default function Documents() {
                   {documents.map((doc, i) => (
                     <div
                       key={i}
+                      onClick={() => navigate("/details")}
                       className="grid grid-cols-6 items-center bg-[#ECECEC] px-4 py-4 rounded-lg gap-4"
                     >
+                      
                       {/* Column 1: Title */}
                       <div className="col-span-2">
                         <h3 className="font-semibold">{doc.title}</h3>

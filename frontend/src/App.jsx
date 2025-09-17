@@ -17,6 +17,9 @@ import DocumentDetails from './pages/DocumentDetails';
 import PreviousDocument from './pages/PreviousDocument';
 import SharedDocuments from './components/SharedDocuments';
 import SharedDocument from './pages/SharedDocument';
+import TeamMembers from './pages/TeamMembers';
+import DashboardOverview from './pages/Dashboard';
+import Upload from './pages/UploadDocument';
 
 function App() {
    const {authUser,checkAuth,isCheckingAuth}=useAuth();
@@ -40,10 +43,13 @@ function App() {
         <Route path='/signup' element={<Signup />} />
         <Route path='/home' element={<Home/>} /> 
 
+        <Route path='/dash' element={<DashboardOverview/>} /> 
         <Route path='/documents' element={<Documents/>} /> 
-        <Route path='/documents/details' element={<DocumentDetails/>} /> 
-        <Route path='/documents/previous' element={<PreviousDocument/>} /> 
-        <Route path='/documents/shared' element={<SharedDocument/>} /> 
+        <Route path='/details' element={<DocumentDetails/>} /> 
+        <Route path='/previous' element={<PreviousDocument/>} /> 
+        <Route path='/shared' element={<SharedDocument/>} /> 
+        <Route path='/upload' element={<Upload/>} /> 
+        <Route path='/team' element={<TeamMembers/>} /> 
       </Routes>
      
     </div>
