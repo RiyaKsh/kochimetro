@@ -12,6 +12,9 @@ import LoginWorker from './pages/EmployeeAuth';
 import SignupWorker from './pages/SignupWorker';
 import Dashboard from './pages/AdminDashboard';
 import Header from './components/Header';
+import Documents from './pages/Documents';
+import DocumentDetails from './pages/DocumentDetails';
+import PreviousDocument from './pages/PreviousDocument';
 
 function App() {
    const {authUser,checkAuth,isCheckingAuth}=useAuth();
@@ -34,6 +37,10 @@ function App() {
         <Route path='/dashboard' element={< Dashboard/>} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/home' element={<Home/>} /> 
+
+        <Route path='/documents' element={<Documents/>} /> 
+        {/* <Route path='/documents/details' element={<DocumentDetails/>} />  */}
+        <Route path='/documents/previous' element={<PreviousDocument/>} /> 
       </Routes>
      
     </div>
