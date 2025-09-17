@@ -39,7 +39,7 @@ function App() {
         <Route path='/home' element={<Home/>} /> 
 
         <Route path='/documents' element={<Documents/>} /> 
-        {/* <Route path='/documents/details' element={<DocumentDetails/>} />  */}
+        <Route path='/documents/details' element={<DocumentDetails/>} /> 
         <Route path='/documents/previous' element={<PreviousDocument/>} /> 
       </Routes>
      
