@@ -3,8 +3,11 @@ const User = require('../Models/User');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const Document = require('../Models/Document');
+const nodemailer = require('nodemailer'); 
 
 // Invite a new employee (Admin only)
+
+
 const inviteEmployee = async (req, res) => {
   try {
     const admin = req.user; // admin info from middleware
@@ -39,21 +42,39 @@ const inviteEmployee = async (req, res) => {
 
     await employee.save();
 
-    // TODO: send email with credentials (rawPassword)
+    // --- SMTP Email Sending ---
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,     
+        pass: process.env.GMAIL_PASS,     
+      },
+    });
+
+    const mailOptions = {
+      from: 'yournewgmail@gmail.com',
+      to: email,
+      subject: 'Your Temporary Password',
+      text: `Hello ${name},\n\nYou have been invited to the system.\n\nYour temporary password is: ${rawPassword}\n\nPlease log in and change your password immediately.\n\nRegards,\nAdmin Team`,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     res.status(201).json({
-      message: 'Employee invited successfully',
+      message: 'Employee invited successfully. Password sent via email.',
       success: true,
       data: {
         userId: employee._id,
-        password: rawPassword, // return plain password for testing
+        // rawPassword: rawPassword, // optional: you can remove if you don’t want to return it
       }
     });
+
   } catch (error) {
     console.error("InviteEmployee Error:", error);
     res.status(500).json({ message: 'Internal server error', success: false });
   }
 };
+
 
 const assignUsersToDocument = async (req, res) => {
   try {
