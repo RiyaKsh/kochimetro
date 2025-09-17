@@ -77,7 +77,7 @@ export default function TeamMembers() {
         },
       ]);
 
-      toast.success(`Employee invited! Temp password: ${res.data.data.password}`);
+      toast.success(`Employee invited successfully ! `);
       setInviteData({ name: "", email: "", role: "" });
       setIsModalOpen(false);
     } catch (err) {
