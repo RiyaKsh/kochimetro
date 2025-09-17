@@ -9,7 +9,7 @@ const Header = () => {
       toast.success('Logging out...');
       
       setTimeout(() => {
-        localStorage.removeItem('authToken'); // Clear auth data
+        localStorage.removeItem('token'); // Clear auth data
         window.location.href = '/';          // Redirect to login
       }, 1500);  // Wait 1.5 seconds so toast is visible
     };
