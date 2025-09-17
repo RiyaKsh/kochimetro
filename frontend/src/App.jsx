@@ -15,6 +15,8 @@ import Header from './components/Header';
 import Documents from './pages/Documents';
 import DocumentDetails from './pages/DocumentDetails';
 import PreviousDocument from './pages/PreviousDocument';
+import SharedDocuments from './components/SharedDocuments';
+import SharedDocument from './pages/SharedDocument';
 
 function App() {
    const {authUser,checkAuth,isCheckingAuth}=useAuth();
@@ -41,6 +43,7 @@ function App() {
         <Route path='/documents' element={<Documents/>} /> 
         <Route path='/documents/details' element={<DocumentDetails/>} /> 
         <Route path='/documents/previous' element={<PreviousDocument/>} /> 
+        <Route path='/documents/shared' element={<SharedDocument/>} /> 
       </Routes>
      
     </div>
