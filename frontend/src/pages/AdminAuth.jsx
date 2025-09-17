@@ -49,10 +49,10 @@ function AuthCard() {
       localStorage.setItem("loggedInUser", data.user.name);
       localStorage.setItem("userRole", data.user.role);
       localStorage.setItem("department", data.user.department);
+      setTimeout(() => navigate("/dash"), 1000);
 
       // Redirect (use backend-provided redirect or fallback)
-      const redirectPath = data.redirectTo || "/dashboard";
-      setTimeout(() => navigate(redirectPath), 1000);
+      
     } else if (error) {
       handleError(error?.details?.[0]?.message || "Login failed");
     } else {
@@ -85,7 +85,7 @@ function AuthCard() {
         handleSuccess(message);
         localStorage.setItem("token", jwtToken);
         localStorage.setItem("loggedInUser", userName);
-        setTimeout(() => navigate("/dashboard"), 1000);
+        setTimeout(() => navigate("/dash"), 1000);
       } else if (error) {
         handleError(error?.details[0].message);
       } else {

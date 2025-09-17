@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { FileText, Shield } from "lucide-react";
+import { FileText } from "lucide-react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import Lock from  "../assets/lock.png";
+import Lock from "../assets/lock.png";
 
 export default function Upload() {
   const [file, setFile] = useState(null);
@@ -13,7 +13,8 @@ export default function Upload() {
     department: "",
     language: "",
     priority: "",
-    access: "",
+    access: "", // "Private", "Department", "Shared"
+    allowedDepartments: [], // optional for cross-department
   });
 
   const handleChange = (e) => {
@@ -24,28 +25,84 @@ export default function Upload() {
     setFile(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
+  const handleAccessChange = (value) => {
+    setForm((prev) => ({
+      ...prev,
+      access: prev.access === value ? "" : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...form, file });
+    if (!file) return alert("Please select a file");
+
+    const data = new FormData();
+    data.append("file", file);
+
+    // Map UI access to backend values
+    let accessValue = "self";
+    if (form.access === "Department") accessValue = "department";
+    if (form.access === "Shared") accessValue = "cross-department";
+    data.append("access", accessValue);
+
+    // Append allowedDepartments if cross-department
+    if (accessValue === "cross-department" && form.allowedDepartments.length) {
+      data.append("allowedDepartments", form.allowedDepartments.join(","));
+    }
+
+    // Append other fields
+    data.append("title", form.title);
+    data.append("description", form.description);
+    data.append("category", form.category);
+    data.append("language", form.language);
+    data.append("priority", form.priority);
+    data.append("department", form.department);
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await fetch("http://localhost:8080/api/documents", {
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert("Document uploaded successfully");
+        setFile(null);
+        setForm({
+          title: "",
+          category: "",
+          description: "",
+          department: "",
+          language: "",
+          priority: "",
+          access: "",
+          allowedDepartments: [],
+        });
+      } else {
+        alert(result.message || "Upload failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading document");
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
       <Header />
-
       <div className="flex flex-1">
-        {/* Sidebar */}
         <Sidebar />
-
-        {/* Main Content */}
         <div className="flex-1 flex justify-center">
           <div className="flex-1 bg-gray-50 p-6 max-w-5xl shadow-2xl m-6 rounded-xl">
             <h1 className="text-2xl font-semibold mb-6">Upload document</h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              
-              <div className="bg-white rounded-xl shadow p-8">
               {/* Uploaded File */}
               <div className="bg-gray-200 rounded-xl shadow p-5 mb-6">
                 <h2 className="flex items-center gap-2 text-lg font-medium mb-4 ">
@@ -173,56 +230,48 @@ export default function Upload() {
                   </div>
                 </div>
               </div>
-              </div>
 
               {/* Access Control */}
               <div className="bg-white rounded-xl shadow p-5">
                 <div className="bg-gray-200 p-3 rounded-xl">
-                <h2 className="flex items-center gap-2 text-lg font-medium mb-4">
-                  {/* <Shield className="text-blue-600" size={18} /> */}
-                  <img src={Lock} alt="lock" className="w-8 h-8" /> 
-                  Access Control
-                </h2>
+                  <h2 className="flex items-center gap-2 text-lg font-medium mb-4">
+                    <img src={Lock} alt="lock" className="w-8 h-8" />
+                    Access Control
+                  </h2>
 
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="access"
-                      value="Private"
-                      checked={form.access === "Private"}
-                      onChange={handleChange}
-                    />
-                    Private (only me)
-                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={form.access === "Private"}
+                        onChange={() => handleAccessChange("Private")}
+                      />
+                      Private (only me)
+                    </label>
 
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="access"
-                      value="Department"
-                      checked={form.access === "Department"}
-                      onChange={handleChange}
-                    />
-                    Department (administration)
-                  </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={form.access === "Department"}
+                        onChange={() => handleAccessChange("Department")}
+                      />
+                      Department (administration)
+                    </label>
 
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="access"
-                      value="Shared"
-                      checked={form.access === "Shared"}
-                      onChange={handleChange}
-                    />
-                    Shared across departments
-                  </label>
-                </div>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={form.access === "Shared"}
+                        onChange={() => handleAccessChange("Shared")}
+                      />
+                      Shared across departments
+                    </label>
+                  </div>
 
-                <div className="mt-3 bg-blue-50 text-blue-800 px-3 py-2 rounded text-sm">
-                  <span className="font-medium">Note:</span> Choose access
-                  carefully, as it determines who can view this document.
-                </div>
+                  <div className="mt-3 bg-blue-50 text-blue-800 px-3 py-2 rounded text-sm">
+                    <span className="font-medium">Note:</span> Choose access
+                    carefully, as it determines who can view this document.
+                  </div>
                 </div>
               </div>
 
@@ -231,6 +280,7 @@ export default function Upload() {
                 <button
                   type="button"
                   className="px-4 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100"
+                  onClick={() => setFile(null)}
                 >
                   Cancel
                 </button>

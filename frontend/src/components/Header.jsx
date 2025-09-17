@@ -2,8 +2,17 @@ import { LogOut, Search } from "lucide-react";
 import React from "react";
 import Bell from "../assets/bell.png";
 import Profile from "../assets/profile.png";
+import { toast } from "react-hot-toast";
 
 const Header = () => {
+  const handleLogout = () => {
+      toast.success('Logging out...');
+      
+      setTimeout(() => {
+        localStorage.removeItem('authToken'); // Clear auth data
+        window.location.href = '/';          // Redirect to login
+      }, 1500);  // Wait 1.5 seconds so toast is visible
+    };
   return (
     <header className="w-full bg-white border-b-3 border-blue flex items-center justify-between px-10">
       <div className=" flex items-center gap-4">
@@ -32,7 +41,7 @@ const Header = () => {
             <img src={Profile} alt="" className="w-6 h-6" />
             <span className="text-sm font-medium ">Admin User</span>
           </div>
-          <button className="px-4 py-2 bg-[#003366] cursor-pointer text-white rounded-md flex items-center space-x-2">
+          <button onClick={handleLogout} className="px-4 py-2 bg-[#003366] cursor-pointer text-white rounded-md flex items-center space-x-2">
             <LogOut size={16} />
             <span>Log out</span>
           </button>

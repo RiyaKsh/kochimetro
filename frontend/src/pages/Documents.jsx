@@ -1,55 +1,68 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  Eye,
-} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Eye } from "lucide-react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import { NavLink, useNavigate } from "react-router-dom";
 
-export default function Documents() {
-  const [activeTab, setActiveTab] = useState("current");
-  const navigate = useNavigate()
+const statusColors = {
+  "Pending Review": "bg-[#DDD275] text-[#585901]",
+  Approved: "bg-[#ACE29C] text-green-800",
+  "Under Review": "bg-[#9CC2E2] text-blue-800",
+  Draft: "bg-[#BFBFBF] text-gray-800",
+};
 
-  const documents = [
-    {
-      title: "Safety Protocol Update Q4 2025",
-      date: "2025-09-13",
-      status: "Pending Review",
-      color: "bg-[#DDD275] text-[#585901]",
-    },
-    {
-      title: "Budget Allocation Report",
-      date: "2025-09-13",
-      status: "Approved",
-      color: "bg-[#ACE29C] text-green-800",
-    },
-    {
-      title: "Engineering Standards Manual",
-      date: "2025-09-13",
-      status: "Under Review",
-      color: "bg-[#9CC2E2] text-blue-800",
-    },
-    {
-      title: "Manual Update",
-      date: "2025-09-13",
-      status: "Draft",
-      color: "bg-[#BFBFBF] text-gray-800",
-    },
-  ];
+export default function Documents() {
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchDocs = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const res = await fetch("http://localhost:8080/api/documents", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          setDocuments(data.data.documents);
+        } else {
+          console.error("Backend error:", data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching docs:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDocs();
+  }, [navigate]);
+
+  if (loading) {
+    return <p className="p-6">Loading documents...</p>;
+  }
 
   return (
     <>
       <Header />
       <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
-
         <Sidebar />
 
         {/* Main content */}
         <div className="flex-1 flex flex-col">
-          {/* Content */}
           <main className="flex-1 p-10">
             <div className="bg-white shadow-2xl rounded-xl p-6">
               {/* Filters */}
@@ -75,7 +88,7 @@ export default function Documents() {
                     to="/documents"
                     className={({ isActive }) =>
                       `px-4 py-2 font-medium rounded-xl border-b-2 ${
-                        isActive ? "text-white bg-[#003366] " : "text-gray-500"
+                        isActive ? "text-white bg-[#003366]" : "text-gray-500"
                       }`
                     }
                   >
@@ -98,15 +111,16 @@ export default function Documents() {
                 <div className="space-y-4">
                   {documents.map((doc, i) => (
                     <div
-                      key={i}
+                      key={doc._id || i}
                       onClick={() => navigate("/details")}
                       className="grid grid-cols-6 items-center bg-[#ECECEC] px-4 py-4 rounded-lg gap-4"
                     >
-                      
                       {/* Column 1: Title */}
                       <div className="col-span-2">
                         <h3 className="font-semibold">{doc.title}</h3>
-                        <p className="text-xs text-gray-500">{doc.date}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(doc.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
 
                       {/* Column 3: Eye Icon */}
@@ -114,7 +128,10 @@ export default function Documents() {
 
                       {/* Column 4: Status */}
                       <span
-                        className={`w-[120px] px-2 py-1 rounded text-sm font-medium  flex items-center justify-center ${doc.color}`}
+                        className={`w-[120px] px-2 py-1 rounded text-sm font-medium flex items-center justify-center ${
+                          statusColors[doc.status] ||
+                          "bg-gray-200 text-gray-700"
+                        }`}
                       >
                         {doc.status}
                       </span>

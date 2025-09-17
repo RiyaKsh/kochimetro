@@ -40,7 +40,7 @@ function Signup() {
             if (success) {
                 handleSuccess(message);
                 setTimeout(() => {
-                    navigate('/dashboard')
+                    navigate('/dash')
                 }, 1000)
             } else if (error) {
                 const details = error?.details[0].message;

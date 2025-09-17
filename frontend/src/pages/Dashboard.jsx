@@ -1,7 +1,79 @@
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 export default function DashboardOverview() {
+   const [overview, setOverview] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchOverview = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const res = await fetch("http://localhost:8080/api/dashboard", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.status === 401) {
+          navigate("/login");
+          return;
+        }
+
+        const data = await res.json();
+        console.log("Dashboard API:", data);
+
+        if (data.success) {
+          setOverview(data.data.overview);
+          setDocuments(data.data.recent.recentDocuments);
+        } else {
+          console.error("Backend error:", data.message);
+        }
+      } catch (err) {
+        console.error("Error fetching overview:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOverview();
+  }, [navigate]);
+    if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex flex-1">
+          <Sidebar />
+          <div className="flex-1 flex justify-center items-center">
+            <p>Loading dashboard data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (!overview) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex flex-1">
+          <Sidebar />
+          <div className="flex-1 flex justify-center items-center">
+            <p className="text-red-500">Failed to load dashboard data.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -24,16 +96,16 @@ export default function DashboardOverview() {
                   Documents Uploaded Today
                 </p>
                 <p className="text-xl font-semibold text-[#003366] flex justify-between ">
-                    <span className="ml-10">24</span>
+                    <span className="ml-10">{overview.documentsUploadedToday}</span>
                    <span className="text-blue-500 text-xl mr-10">+12%</span>
                 </p>
               </div>
               <div className="bg-[#DAE6F2] w-sm shadow-md rounded-xl py-8 text-center ">
                 <p className="text-gray-700 font-medium mb-4 text-xl">
-                  Pending Compliance
+                  Pending Compliances
                 </p>
                 <p className="text-xl font-semibold text-[#003366] flex justify-between ">
-                    <span className="ml-10">8</span>
+                    <span className="ml-10">{overview.pendingCompliance}</span>
                    <span className="text-red-500 text-xl mr-10">-3</span>
                 </p>
               </div>
@@ -43,7 +115,7 @@ export default function DashboardOverview() {
                  Active Departments
                 </p>
                 <p className="text-xl font-semibold text-[#003366] flex justify-between ">
-                    <span className="ml-10">9</span>
+                    <span className="ml-10">{overview.activeDepartments}</span>
                    <span className="text-blue-500 text-xl mr-10">All</span>
                 </p>
               </div>
@@ -53,7 +125,7 @@ export default function DashboardOverview() {
                 Knowledge Base Items
                 </p>
                 <p className="text-xl font-semibold text-[#003366] flex justify-between ">
-                    <span className="ml-10">150</span>
+                    <span className="ml-10">{overview.knowledgeBaseItems}</span>
                    <span className="text-blue-500 text-xl mr-10">+18</span>
                 </p>
               </div>
@@ -70,59 +142,39 @@ export default function DashboardOverview() {
                 </button>
               </div>
 
-              <div className="space-y-10 m-8 ">
-                {/* Document Row */}
-                <div className="flex justify-between items-center  pb-2 bg-[#ECECEC] px-4 py-4">
-                  <div>
-                    <p className="font-medium mb-3">Safety Protocol Update Q4 2024</p>
-                    <p className="text-xs text-gray-500">
-                      Safety • 2025-09-13 •{" "}
-                      <span className="text-red-500">High</span>
-                    </p>
-                  </div>
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-xs font-medium rounded">
-                    Pending Review
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center  pb-2 bg-[#ECECEC] px-4 py-4">
-                  <div>
-                    <p className="font-medium mb-3">Budget Allocation Report</p>
-                    <p className="text-xs text-gray-500">
-                      Finance • 2025-09-13 •{" "}
-                      <span className="text-yellow-600">Medium</span>
-                    </p>
-                  </div>
-                  <span className="bg-green-100 text-green-800 px-2 py-1 text-xs font-medium rounded">
-                    Approved
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center  pb-2 bg-[#ECECEC] px-4 py-4">
-                  <div>
-                    <p className="font-medium mb-3">Engineering Standards Manual</p>
-                    <p className="text-xs text-gray-500">
-                      Engineering • 2025-09-13 •{" "}
-                      <span className="text-red-500">High</span>
-                    </p>
-                  </div>
-                  <span className="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded">
-                    Under Review
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center bg-[#ECECEC] px-4 py-4">
-                  <div>
-                    <p className="font-medium mb-3">HR Policy Update</p>
-                    <p className="text-xs text-gray-500">
-                      HR • 2025-09-13 •{" "}
-                      <span className="text-gray-500">Low</span>
-                    </p>
-                  </div>
-                  <span className="bg-gray-200 text-gray-700 px-2 py-1 text-xs font-medium rounded">
-                    Draft
-                  </span>
-                </div>
+              <div className="space-y-10 m-8">
+                {documents.length > 0 ? (
+                  documents.map((doc, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center pb-2 bg-[#ECECEC] px-4 py-4"
+                    >
+                      <div>
+                        <p className="font-medium mb-3">{doc.title}</p>
+                        <p className="text-xs text-gray-500">
+                          {doc.department} •{" "}
+                          {new Date(doc.createdAt).toLocaleDateString()} •{" "}
+                          <span className="text-red-500">High</span>
+                        </p>
+                      </div>
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded ${
+                          doc.status === "Pending Review"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : doc.status === "Approved"
+                            ? "bg-green-100 text-green-800"
+                            : doc.status === "Under Review"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        {doc.status}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No recent documents found.</p>
+                )}
               </div>
             </div>
           </div>
