@@ -71,38 +71,42 @@ const uploadDocument = async (req, res) => {
 
         // Make sure allowedDepartments is always an array
         let allowedDepartments = req.body.allowedDepartments || [];
-        if (typeof allowedDepartments === 'string') {
-            allowedDepartments = allowedDepartments.split(',').map(d => d.trim());
-        }
+const { title, description, category, language, priority, access } = req.body;
 
-        const { title, description, category, language, priority, access } = req.body;
+// Handle allowedDepartments based on access type
+if (access === 'self') {
+    allowedDepartments = []; // only uploader can access
+} else if (access === 'department') {
+    allowedDepartments = [req.user.department]; // all employees in uploader's dept
+} else if (access === 'cross-department') {
+    if (!allowedDepartments.length) {
+        // Give access to all other departments
+        const allDepartments = ['engineering', 'procurement', 'hr', 'finance', 'safety', 'legal','marketting']; // replace with your list
+        allowedDepartments = allDepartments.filter(d => d !== req.user.department);
+    }
+}
 
-        // Validate cross-dept selection
-        if (access === 'cross-department' && (!allowedDepartments || allowedDepartments.length === 0)) {
-            return res.status(400).json({ message: 'Select at least one department to share with' });
-        }
-
-        const newDocument = new Document({
-            title,
-            description,
-            category,
-            language,
-            priority,
+const newDocument = new Document({
+    title,
+    description,
+    category,
+    language,
+    priority,
+    uploadedBy: req.user._id,
+    department: req.user.department,
+    access,
+    allowedDepartments,
+    versions: [
+        {
+            fileUrl: req.file.path,
             uploadedBy: req.user._id,
-            department: req.user.department,
-            access,
-            allowedDepartments: access === 'cross-department' ? allowedDepartments : [],
-            versions: [
-                {
-                    fileUrl: req.file.path,
-                    uploadedBy: req.user._id,
-                    versionNumber: 1
-                }
-            ],
-            currentVersion: 1
-        });
+            versionNumber: 1
+        }
+    ],
+    currentVersion: 1
+});
 
-        await newDocument.save();
+await newDocument.save();
 
         res.status(201).json({
             message: 'Document uploaded successfully',
